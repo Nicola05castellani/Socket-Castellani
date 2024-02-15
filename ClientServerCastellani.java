@@ -1,45 +1,56 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
-package client.server.castellani;
-import client.server;
-import java.io;
-import java.util.;
-import java.net.;
+import java.io.*;
+import java.net.*;
 
-public class ServerStr {
-    ServerSocket server = null;
-    Socket client = null;
-    String stringaRicevuta = null;
-    String stringaModificata = null;
-    BufferReader inDalClientt;
-    DataOutputStream out VersoClient;
-    
-    public socket attendi (){
-    try{
-        System.out.println("server partito in esecuzione");
-        server = new ServerSocket(6789);
-        client = server.accept();
-        server.close();
-        inDalClient = new BufferReader(new InputStreamReader(client.getInputStream()));
-        outVersoClient = new DataOutputStream(client.getOutputStream());
+public class ClientStr {
+    String nomeServer = "localhost";
+    int portaServer = 6789;
+    Socket miosocket;
+    BufferedReader tastiera;
+    String stringaUtente;
+    String stringaRicevutaDalServer;
+    DataOutputStream outVersoServer;
+    BufferedReader inDalServer;
+   
+    public Socket connetti(){
+        System.out.println("2 CLIENT partito");
+        try{
+            tastiera = new BufferedReader(new InputStreamReader(System.in));
+            miosocket = new Socket(nomeServer, portaServer);
+            outVersoServer = new DataOutputStream(miosocket.getOutputStream());
+            inDalServer = new BufferedReader(new InputStreamReader(miosocket.getInputStream()));
+        }
+        catch(UnknownHostException e){
+            System.err.println("host sconosciuto");
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            System.out.println("Errore in connessione");
+            System.exit(1);
+        }
+        return miosocket;
     }
-    
-    catch (Excepion e){
-        System.out.printl(e.getMessage());
-        System.out.printl("errore durante l'istanza");
-    }
-    return client;
-    }
-
-    
     public void comunica(){
-        System.out.println("3 benvenuto cliet,scrivi frase trasfotmo in maiuscolo");
-        
+        try{
+            System.out.println("4 .. inserisci la stringa");
+            stringaUtente = tastiera.readLine();
+            System.out.println("5 .. invio stringa");
+            outVersoServer.writeBytes(stringaUtente + '\n');
+            stringaRicevutaDalServer = inDalServer.readLine();
+            System.out.println("8 .. risposta dal server " + '\n' + stringaRicevutaDalServer);
+        }catch (Exception e) {
+            System.out.println(e.getMessage());
+            System.out.println("Errore durante la comunicazione con il client!");
+            System.exit(1);
+        }
     }
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
-    
+
+public static void main(String args[]) {
+
+ClientStr client = new ClientStr();
+
+client.connetti ();
+
+client.comunica();
+
+}
 }
